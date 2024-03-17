@@ -137,6 +137,12 @@ def infer(model, batch):
         MI = torch.mean(mi_lb)
 
     return MI
+
+def scale_data(input):
+    min_val = np.min(input)
+    max_val = np.max(input)
+    scaled = 2 * (input - min_val) / (max_val - min_val) - 1
+    return scaled
     
 if __name__ == '__main__':
     ma_rate = 1.0
@@ -148,6 +154,7 @@ if __name__ == '__main__':
         ###################################################################
         # fine tune step, train data has shape [batchsize, sequence_length, 2]
         # suppose you have high dimensional data, then the train data uses random linear projection into one dimension
+        # data preprocess is crucial, please ensure that for each [i, :, :] (samples from one distribution), it has a data scaling to [-1, 1]
         batch = batch #### prepare your batch here
 
         train_loss = run(total_epoch=1, batch=batch, writer=writer)
