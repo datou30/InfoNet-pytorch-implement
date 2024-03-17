@@ -19,7 +19,7 @@ from perceiver.decoder import PerceiverDecoder
 from perceiver.perceiver import PerceiverIO
 from perceiver.query import Query_Gen
 from perceiver.query_new import Query_Gen_transformer, Query_Gen_transformer_PE
-from util.epoch_timer import epoch_time, scale_data
+from util.epoch_timer import epoch_time
 from util.look_table import lookup_value_2d, lookup_value_close, lookup_value_average, lookup_value_bilinear, lookup_value_grid
 
 from perceiver.encoder import PerceiverEncoder
@@ -75,6 +75,12 @@ model = nn.DataParallel(model) #data parallel, make the model run on multiple GP
 model.load_state_dict(torch.load('saved/model_2000_64_1000-42000--0.17.pt', map_location=device))
 #
 print(f'The model has {count_parameters(model):,} trainable parameters')
+
+def scale_data(input):
+    min_val = np.min(input)
+    max_val = np.max(input)
+    scaled = 2 * (input - min_val) / (max_val - min_val) - 1
+    return scaled
 
 def infer(model, batch):
     model.eval()
